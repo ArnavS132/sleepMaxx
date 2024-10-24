@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleep Tracker & Guide</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <style>
+        
+        body {
+            font-family: 'Helvetica', sans-serif;
+            background: linear-gradient(135deg, #9b59b6, #6a1b9a, #512da8);
+            color: #2e4057;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+      
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #f7fafc;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background-color: #f3e5f5;
+            
+        }
+
+      
+        h1,
+        h2 {
+            color: #d1c4e9;
+            
+        }
+
+        .input-section,
+        .result-section,
+        .tips-section {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 12px;
+            background-color: #f3e5f5;
+            
+        }
+
+   
+        input {
+            padding: 10px;
+            font-size: 18px;
+            width: 80px;
+            border-radius: 8px;
+            border: 1px solid #8e44ad;
+            background-color: #e1bee7;
+        }
+
+     
+        button {
+            padding: 10px 25px;
+            font-size: 18px;
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #6a1b9a;
+        }
+
+     
+        .moon {
+            font-size: 60px;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+   
+        .links {
+            margin-top: 20px;
+            color: #d1c4e9;
+        }
+
+       
+        .result-section,
+        .tips-section {
+            display: none;
+            opacity: 0;
+        }
+
+        .reset-log {
+            margin-top: 20px;
+            background-color: #d32f2f;
+        }
+
+        .reset-log:hover {
+            background-color: #b71c1c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container fade-in">
+        <div class="moon">🌙</div>
+        <h1>Sleep Tracker & Guide</h1>
+
+        <div class="input-section">
+            <h2>Enter Your Sleep Duration</h2>
+            <label for="sleep-hours">How many hours did you sleep?</label><br><br>
+            <input type="number" id="sleep-hours" min="0" max="24" placeholder="Hours">
+            <button onclick="analyzeSleep()">Submit</button>
+        </div>
+
+        <div class="result-section fade-in">
+            <h2>Sleep Analysis</h2>
+            <p id="analysis"></p>
+            <p id="bedtime-suggestion"></p>
+        </div>
+
+        <div class="tips-section fade-in">
+            <h2>Tips for Better Sleep</h2>
+            <ul id="sleep-tips">
+                <li>Avoid screens 30 minutes before bed.</li>
+                <li>Maintain a consistent sleep schedule.</li>
+                <li>Limit caffeine in the afternoon.</li>
+                <li>Create a relaxing bedtime routine.</li>
+                <li>Keep your bedroom cool, quiet, and dark.</li>
+            </ul>
+        </div>
+
+        <div class="links">
+            <a href="weekly-summary.html">View Weekly Summary</a> |
+            <a href="settings.html">Set Sleep Goals</a>
+        </div>
+
+        <div class="manual-input-section fade-in">
+            <h2>Manual Sleep Input</h2>
+            <label for="bedtime">Bedtime:</label><br>
+            <input type="time" id="bedtime"><br><br>
+
+            <label for="wakeup">Wake-up Time:</label><br>
+            <input type="time" id="wakeup"><br><br>
+
+            <label for="refresh-rating">How refreshed did you feel (1-10)?</label><br>
+            <input type="number" id="refresh-rating" min="1" max="10"><br><br>
+
+            <button onclick="calculateSleepData()">Submit</button>
+        </div>
+
+       
+        <button class="reset-log" onclick="resetSleepLog()">Reset Log</button>
+    </div>
+
+    <script>
+        let sleepData = JSON.parse(localStorage.getItem("sleepData")) || [];
+
+        function analyzeSleep() {
+            const hoursInput = document.getElementById("sleep-hours").value;
+            const hours = parseFloat(hoursInput);
+            const analysisSection = document.querySelector(".result-section");
+            const tipsSection = document.querySelector(".tips-section");
+            const analysisText = document.getElementById("analysis");
+
+            if (isNaN(hours) || hours < 0 || hours > 24) {
+                alert("Please enter a valid number of hours between 0 and 24.");
+                return;
+            }
+
+          
+            analysisSection.style.display = "block";
+            tipsSection.style.display = "block";
+
+            let today = new Date().toISOString().split('T')[0];
+
+            sleepData.push({ date: today, hours: hours });
+            localStorage.setItem("sleepData", JSON.stringify(sleepData));
+
+            if (hours < 6) {
+                analysisText.innerText = "You had less than 6 hours of sleep. Try to get more rest!";
+            } else if (hours >= 6 && hours <= 9) {
+                analysisText.innerText = "You had a healthy amount of sleep. Keep it up!";
+            } else {
+                analysisText.innerText = "You had more than 9 hours of sleep. Oversleeping may not be beneficial!";
+            }
+
+            
+            calculateAverageSleep();
+        }
+
+        function calculateAverageSleep() {
+            if (sleepData.length === 0) return;
+
+            const totalSleep = sleepData.reduce((acc, entry) => acc + entry.hours, 0);
+            const averageSleep = totalSleep / sleepData.length;
+
+            document.getElementById("average-sleep").innerText = `Average Sleep: ${averageSleep.toFixed(2)} hours per night`;
+
+            const sleepLog = sleepData.map(entry => `<li>${entry.date}: Slept ${entry.hours} hours</li>`).join("");
+            document.getElementById("sleep-log").innerHTML = sleepLog;
+        }
+
+        function calculateSleepData() {
+            const bedtime = document.getElementById('bedtime').value;
+            const wakeup = document.getElementById('wakeup').value;
+            const refreshRating = parseInt(document.getElementById('refresh-rating').value);
+
+            if (!bedtime || !wakeup || isNaN(refreshRating) || refreshRating < 1 || refreshRating > 10) {
+                alert("Please fill out all fields with valid values. Refresh rating must be between 1 and 10.");
+                return;
+            }
+
+            const bedtimeDate = new Date(`1970-01-01T${bedtime}:00`);
+            const wakeupDate = new Date(`1970-01-02T${wakeup}:00`);
+            const totalSleepTime = (wakeupDate - bedtimeDate) / (1000 * 60 * 60);
+
+            if (totalSleepTime <= 0 || isNaN(totalSleepTime)) {
+                alert("Invalid sleep times. Ensure your wake-up time is after your bedtime.");
+                return;
+            }
+
+            const sleepEntry = {
+                date: new Date().toISOString().split('T')[0],
+                bedtime: bedtime,
+                wakeup: wakeup,
+                totalSleepTime: totalSleepTime.toFixed(2),
+                refreshRating: refreshRating
+            };
+
+            sleepData.push(sleepEntry);
+            localStorage.setItem("sleepData", JSON.stringify(sleepData));
+
+            alert(`Sleep duration: ${totalSleepTime.toFixed(2)} hours. Refresh Rating: ${refreshRating}`);
+            suggestBedtimes(totalSleepTime, refreshRating);
+        }
+
+        function suggestBedtimes(totalSleepTime, refreshRating) {
+            const bedtimeSuggestion = document.getElementById("bedtime-suggestion");
+            if (refreshRating <= 3) {
+                bedtimeSuggestion.innerText = "You may not be feeling refreshed. Consider adjusting your bedtime earlier or reducing screen time.";
+            } else if (refreshRating > 3 && refreshRating <= 7) {
+                bedtimeSuggestion.innerText = "You're moderately refreshed. Sticking to a consistent schedule could improve sleep quality.";
+            } else {
+                bedtimeSuggestion.innerText = "Great sleep quality! Keep maintaining your healthy sleep habits.";
+            }
+        }
+
+        function resetSleepLog() {
+            if (confirm("Are you sure you want to reset your sleep log?")) {
+                localStorage.removeItem("sleepData");
+                sleepData = [];
+                calculateAverageSleep();
+            }
+        }
+
+       
+        calculateAverageSleep();
+    </script>
+</body>
+
+</html>
