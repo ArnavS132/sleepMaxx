@@ -51,82 +51,80 @@
   <div class="container">
     <h1>Weekly Sleep Summary</h1>
     <div id="summary"></div>
-    <canvas id="sleepChart" width="400" height="200"></canvas> <!-- Canvas for Chart.js graph -->
+    <canvas id="sleepChart" width="400" height="200"></canvas> 
     <a href="index.html">Back to Sleep Tracker</a>
   </div>
 
   <script>
     const sleepData = JSON.parse(localStorage.getItem("sleepData")) || [];
-const goal = localStorage.getItem("sleepGoal") || 8; 
-const summaryDiv = document.getElementById("summary");
+    const goal = localStorage.getItem("sleepGoal") || 8; 
+    const summaryDiv = document.getElementById("summary");
 
-if (sleepData.length === 0) {
-  summaryDiv.innerText = "No data available.";
-} else {
-  let summaryHTML = "<ul>";
-  let totalHours = 0;
+    if (sleepData.length === 0) {
+      summaryDiv.innerText = "No data available.";
+    } else {
+      let summaryHTML = "<ul>";
+      let totalHours = 0;
 
-  const validData = sleepData
-    .slice(-7) 
-    .filter(entry => entry.hours !== undefined && !isNaN(entry.hours));
+      
+      const validData = sleepData
+        .slice(-7) 
+        .filter(entry => entry.hours !== undefined && !isNaN(entry.hours));
 
-  validData.forEach(entry => {
-    summaryHTML += `<li>${entry.date}: Slept ${entry.hours} hours</li>`;
-    totalHours += entry.hours;
-  });
+      validData.forEach(entry => {
+        summaryHTML += <li>${entry.date}: Slept ${entry.hours} hours</li>;
+        totalHours += entry.hours;
+      });
 
-  let avgSleep = validData.length > 0 ? (totalHours / validData.length).toFixed(2) : 0;
-  summaryHTML += `</ul><h2>Average Sleep: ${avgSleep} hours per night</h2>`;
-  summaryDiv.innerHTML = summaryHTML;
+     
+      let avgSleep = validData.length > 0 ? (totalHours / validData.length).toFixed(2) : 0;
+      summaryHTML += </ul><h2>Average Sleep: ${avgSleep} hours per night</h2>;
+      summaryDiv.innerHTML = summaryHTML;
 
-  const dates = validData.map(entry => entry.date);
-  const hours = validData.map(entry => entry.hours);
+      
+      const dates = validData.map(entry => entry.date);
+      const hours = validData.map(entry => entry.hours);
 
-  const maxSleep = Math.max(Math.max(...hours), goal);
-  const suggestedMax = maxSleep > goal ? maxSleep + 2 : goal + 2;
-
-  const ctx = document.getElementById('sleepChart').getContext('2d');
-  const sleepChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: dates,
-      datasets: [{
-        label: 'Hours Slept',
-        data: hours,
-        backgroundColor: 'rgba(98, 157, 204, 0.6)',
-        borderColor: 'rgba(98, 157, 204, 1)',
-        borderWidth: 1
-      }, {
-        label: 'Goal',
-        data: Array(dates.length).fill(goal), 
-        type: 'line',
-        borderColor: 'rgba(255, 99, 132, 1)',
-        borderWidth: 2,
-        fill: false,
-        pointRadius: 0,
-        lineTension: 0
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true,
-          suggestedMax: suggestedMax 
+      
+      const ctx = document.getElementById('sleepChart').getContext('2d');
+      const sleepChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: dates, 
+          datasets: [{
+            label: 'Hours Slept',
+            data: hours,
+            backgroundColor: 'rgba(98, 157, 204, 0.6)',
+            borderColor: 'rgba(98, 157, 204, 1)',
+            borderWidth: 1
+          }, {
+            label: 'Goal',
+            data: Array(dates.length).fill(goal), 
+            type: 'line',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 2,
+            fill: false,
+            pointRadius: 0,
+            lineTension: 0
+          }]
         },
-        x: {
-          min: 0, 
-          max: Math.max(2, dates.length - 1) 
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              suggestedMax: Math.max(Math.max(...hours), goal) + 2 
+            }
+          },
+          plugins: {
+            legend: {
+              display: true
+            }
+          }
         }
-      },
-      plugins: {
-        legend: {
-          display: true
-        }
-      }
+      });
     }
-  });
-}
 
+  </script>
 
 </body>
 
