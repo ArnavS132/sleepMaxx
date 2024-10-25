@@ -31,8 +31,6 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('https://i.imgur.com/KcHc2hA.png') repeat;
-            animation: starryBackground 100s linear infinite;
             opacity: 0.3;
             z-index: -1;
         }
@@ -227,7 +225,7 @@
             <p class="recommended-sleep" id="recommended-sleep"></p> <!-- Added this for recommendation output -->
         </div>
 
-        <!-- Reset Log Button -->
+    
         <button class="reset-log" onclick="resetSleepLog()">Reset Log</button>
     </div>
 
@@ -246,11 +244,13 @@
                 return;
             }
 
-            // Show sections with animation
+           
             analysisSection.style.display = "block";
             tipsSection.style.display = "block";
 
-            let today = new Date().toISOString().split('T')[0];
+            let today = new Date().toLocaleDateString();
+
+
 
             sleepData.push({ date: today, hours: hours });
             localStorage.setItem("sleepData", JSON.stringify(sleepData));
@@ -291,6 +291,7 @@
 
             const bedtime = new Date(`1970-01-01T${bedtimeInput}:00`);
             const wakeup = new Date(`1970-01-01T${wakeupInput}:00`);
+
             let sleepDuration = (wakeup - bedtime) / (1000 * 60 * 60); // Convert to hours
 
             if (sleepDuration < 0) {
@@ -301,7 +302,7 @@
 
             let recommendedSleep = '';
 
-            // Suggest ideal sleep duration based on how refreshed they felt
+            
             if (refreshRating <= 5) {
                 recommendedSleep = "It looks like you aren't getting enough restful sleep. Try aiming for 8-9 hours of sleep.";
             } else if (refreshRating > 5 && sleepDuration < 7) {

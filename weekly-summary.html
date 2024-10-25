@@ -51,13 +51,13 @@
   <div class="container">
     <h1>Weekly Sleep Summary</h1>
     <div id="summary"></div>
-    <canvas id="sleepChart" width="400" height="200"></canvas> <!-- Canvas for Chart.js graph -->
+    <canvas id="sleepChart" width="400" height="200"></canvas> 
     <a href="index.html">Back to Sleep Tracker</a>
   </div>
 
   <script>
     const sleepData = JSON.parse(localStorage.getItem("sleepData")) || [];
-    const goal = localStorage.getItem("sleepGoal") || 8; // Default goal to 8 hours if not set
+    const goal = localStorage.getItem("sleepGoal") || 8; 
     const summaryDiv = document.getElementById("summary");
 
     if (sleepData.length === 0) {
@@ -66,9 +66,9 @@
       let summaryHTML = "<ul>";
       let totalHours = 0;
 
-      // Filter out invalid entries
+      
       const validData = sleepData
-        .slice(-7) // Only last 7 entries
+        .slice(-7) 
         .filter(entry => entry.hours !== undefined && !isNaN(entry.hours));
 
       validData.forEach(entry => {
@@ -76,30 +76,30 @@
         totalHours += entry.hours;
       });
 
-      // Check if there are valid data points to calculate the average
+     
       let avgSleep = validData.length > 0 ? (totalHours / validData.length).toFixed(2) : 0;
       summaryHTML += `</ul><h2>Average Sleep: ${avgSleep} hours per night</h2>`;
       summaryDiv.innerHTML = summaryHTML;
 
-      // Prepare data for the chart
+      
       const dates = validData.map(entry => entry.date);
       const hours = validData.map(entry => entry.hours);
 
-      // Create chart
+      
       const ctx = document.getElementById('sleepChart').getContext('2d');
       const sleepChart = new Chart(ctx, {
         type: 'bar',
         data: {
-          labels: dates, // Dates of the week
+          labels: dates, 
           datasets: [{
             label: 'Hours Slept',
-            data: hours, // Hours slept each day
+            data: hours,
             backgroundColor: 'rgba(98, 157, 204, 0.6)',
             borderColor: 'rgba(98, 157, 204, 1)',
             borderWidth: 1
           }, {
             label: 'Goal',
-            data: Array(dates.length).fill(goal), // Show goal as a flat line across all dates
+            data: Array(dates.length).fill(goal), 
             type: 'line',
             borderColor: 'rgba(255, 99, 132, 1)',
             borderWidth: 2,
@@ -112,7 +112,7 @@
           scales: {
             y: {
               beginAtZero: true,
-              suggestedMax: Math.max(Math.max(...hours), goal) + 2 // Dynamically set max scale
+              suggestedMax: Math.max(Math.max(...hours), goal) + 2 
             }
           },
           plugins: {
