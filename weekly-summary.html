@@ -72,13 +72,13 @@
         .filter(entry => entry.hours !== undefined && !isNaN(entry.hours));
 
       validData.forEach(entry => {
-        summaryHTML += <li>${entry.date}: Slept ${entry.hours} hours</li>;
+        summaryHTML += `<li>${entry.date}: Slept ${entry.hours} hours</li>`;
         totalHours += entry.hours;
       });
 
      
       let avgSleep = validData.length > 0 ? (totalHours / validData.length).toFixed(2) : 0;
-      summaryHTML += </ul><h2>Average Sleep: ${avgSleep} hours per night</h2>;
+      summaryHTML += `</ul><h2>Average Sleep: ${avgSleep} hours per night</h2>`;
       summaryDiv.innerHTML = summaryHTML;
 
       
